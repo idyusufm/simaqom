@@ -1,6 +1,17 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
-const APP_VERSION = '1.1.1'
+const FALLBACK_VERSION = '1.1.2'
+
+function getAppVersion() {
+  if (typeof window !== 'undefined' && window.AndroidBridge && typeof window.AndroidBridge.getAppVersion === 'function') {
+    try {
+      return window.AndroidBridge.getAppVersion()
+    } catch (e) {
+      return FALLBACK_VERSION
+    }
+  }
+  return FALLBACK_VERSION
+}
 
 function TelegramIcon() {
   return (
@@ -15,14 +26,20 @@ function GithubIcon() {
 }
 
 function openExternal(url) {
-  // Some Android WebView-wrapper apps honor "_system" (a legacy Cordova
-  // InAppBrowser convention) to force the link out to the real system
-  // browser instead of an embedded child WebView. Falls back to a normal
-  // new-tab open for regular browsers where "_system" has no special effect.
-  window.open(url, '_system')
+  if (typeof window !== 'undefined' && window.AndroidBridge && typeof window.AndroidBridge.openExternal === 'function') {
+    window.AndroidBridge.openExternal(url)
+  } else {
+    window.open(url, '_blank')
+  }
 }
 
 export default function About() {
+  const [appVersion, setAppVersion] = useState(FALLBACK_VERSION)
+
+  useEffect(() => {
+    setAppVersion(getAppVersion())
+  }, [])
+
   return (
     <>
       <div className="section-row">
@@ -32,7 +49,7 @@ export default function About() {
       <div className="card" style={{ textAlign: 'center', padding: '32px 18px' }}>
         <div style={{ fontSize: 40, marginBottom: 8 }}>🏛️</div>
         <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.02em' }}>SIMAQOM</div>
-        <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>Versi {APP_VERSION}</div>
+        <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>Versi {appVersion}</div>
       </div>
 
       <div className="card" style={{ display: 'flex', justifyContent: 'center', gap: 32 }}>

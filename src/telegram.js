@@ -1,14 +1,13 @@
+const PROXY_URL = 'https://simaqom-telebot.id-yusufm.workers.dev/'
+
 export async function notifyTelegram(text) {
-  const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN
-  const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID
-  if (!token || !chatId) return
   try {
-    await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+    await fetch(PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text }),
+      body: JSON.stringify({ text }),
     })
   } catch (e) {
-    // Silently ignore — notification failing should never block sign-in flow.
+    // Diamkan saja — notifikasi gagal tidak boleh menghentikan alur login.
   }
 }

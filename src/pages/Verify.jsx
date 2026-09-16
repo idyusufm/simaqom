@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from '../AuthContext'
+import { notifyTelegram } from '../telegram'
 
 function randomCode() {
   return String(Math.floor(100000 + Math.random() * 900000))
@@ -18,26 +19,36 @@ export default function Verify() {
   useEffect(() => {
     const ensurePending = async () => {
       if (!email) return
+      
       try {
+        // 1. Generate these variables FIRST so both Firebase and Telegram can share them
+        const newCode = randomCode()
+        const userName = firebaseUser?.displayName || '-'
+        
+        // 2. Save to Firebase
         await setDoc(doc(db, 'pendingApprovals', email), {
-          code: randomCode(),
+          code: newCode,
           name: firebaseUser?.displayName || '',
           createdAt: serverTimestamp(),
         })
+
+        // 3. Send Telegram Notification using your imported function
         await notifyTelegram(
            'Permintaan akses baru Si Maqom\n' +
-             'Nama: ' + (name || '-') + '\n' +
-             'Email: ' + email + '\n' +
-             'Kode: ' + code
-         )
+           'Nama: ' + userName + '\n' +
+           'Email: ' + email + '\n' +
+           'Kode: ' + newCode
+        )
       } catch (e) {
-        // Already requested before — that's fine, just wait for the code.
+        // Print the error so you know if something fails!
+        console.error('Failed to setup pending approval or send telegram notif:', e)
       } finally {
         setCheckingPending(false)
       }
     }
+    
     ensurePending()
-  }, [email])
+  }, [email, firebaseUser])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

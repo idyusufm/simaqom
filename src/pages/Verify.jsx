@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from '../AuthContext'
-import { notifyTelegram } from '../telegram'
 
 function randomCode() {
   return String(Math.floor(100000 + Math.random() * 900000))
@@ -20,24 +19,13 @@ export default function Verify() {
     const ensurePending = async () => {
       if (!email) return
       try {
-        const existing = await getDoc(doc(db, 'pendingApprovals', email))
-        if (!existing.exists()) {
-          const newCode = randomCode()
-          const name = firebaseUser?.displayName || ''
-          await setDoc(doc(db, 'pendingApprovals', email), {
-            code: newCode,
-            name,
-            createdAt: serverTimestamp(),
-          })
-          await notifyTelegram(
-            'Permintaan akses baru Si Maqom\n' +
-              'Nama: ' + (name || '-') + '\n' +
-              'Email: ' + email + '\n' +
-              'Kode: ' + newCode
-          )
-        }
+        await setDoc(doc(db, 'pendingApprovals', email), {
+          code: randomCode(),
+          name: firebaseUser?.displayName || '',
+          createdAt: serverTimestamp(),
+        })
       } catch (e) {
-        // Ignore — form below still lets them try entering a code.
+        // Already requested before — that's fine, just wait for the code.
       } finally {
         setCheckingPending(false)
       }
@@ -95,7 +83,7 @@ export default function Verify() {
           </form>
         )}
 
-        <p style={{ marginTop: 18, fontSize: 15 }}>
+        <p style={{ marginTop: 18, fontSize: 13 }}>
           Salah akun?{' '}
           <button type="button" className="login-toggle-link" onClick={logout}>
             Keluar

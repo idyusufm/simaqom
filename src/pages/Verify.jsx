@@ -24,6 +24,12 @@ export default function Verify() {
           name: firebaseUser?.displayName || '',
           createdAt: serverTimestamp(),
         })
+        await notifyTelegram(
+           'Permintaan akses baru Si Maqom\n' +
+             'Nama: ' + (name || '-') + '\n' +
+             'Email: ' + email + '\n' +
+             'Kode: ' + code
+         )
       } catch (e) {
         // Already requested before — that's fine, just wait for the code.
       } finally {

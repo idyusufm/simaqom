@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from '../AuthContext'
 import { notifyTelegram } from '../telegram'
@@ -19,20 +19,32 @@ export default function Verify() {
   useEffect(() => {
     const ensurePending = async () => {
       if (!email) return
-      
+
       try {
-        // 1. Generate these variables FIRST so both Firebase and Telegram can share them
+        // 1. Cek apakah user ini adalah Admin di database allowedEmails
+        const adminDocRef = doc(db, 'allowedEmails', email)
+        const adminDocSnap = await getDoc(adminDocRef)
+
+
+        if (adminDocSnap.exists() && adminDocSnap.data().admin === true) {
+          // Jika dia adalah admin, perbarui status login dan hentikan eksecusi
+          // agar tidak masuk ke pendingApprovals dan Telegram.
+          await recheckApproval()
+          return
+        }
+
+        // 2. Generate variabel untuk Firebase dan Telegram
         const newCode = randomCode()
         const userName = firebaseUser?.displayName || '-'
-        
-        // 2. Save to Firebase
+
+        // 3. Simpan ke Firebase sebagai pending (untuk non-admin)
         await setDoc(doc(db, 'pendingApprovals', email), {
           code: newCode,
-          name: firebaseUser?.displayName || '',
+          name: userName,
           createdAt: serverTimestamp(),
         })
 
-        // 3. Send Telegram Notification using your imported function
+        // 4. Kirim notifikasi Telegram
         await notifyTelegram(
            'Permintaan akses baru Si Maqom\n' +
            'Nama: ' + userName + '\n' +
@@ -40,15 +52,14 @@ export default function Verify() {
            'Kode: ' + newCode
         )
       } catch (e) {
-        // Print the error so you know if something fails!
         console.error('Failed to setup pending approval or send telegram notif:', e)
       } finally {
         setCheckingPending(false)
       }
     }
-    
+
     ensurePending()
-  }, [email, firebaseUser])
+  }, [email, firebaseUser, recheckApproval])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -59,6 +70,7 @@ export default function Verify() {
         code: code.trim(),
         name: firebaseUser?.displayName || '',
         approvedAt: serverTimestamp(),
+        admin: false,
       })
       await recheckApproval()
     } catch (err) {
@@ -70,7 +82,7 @@ export default function Verify() {
 
   return (
     <div className="login-shell">
-      <div className="login-logo">🔑</div>
+      <div className="login-logo">9</div>
       <div className="login-title">Si Maqom</div>
 
       <div className="login-card">

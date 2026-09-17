@@ -117,7 +117,8 @@ export default function Verify() {
   }
 
   return (
-    <div className="login-logo">
+    <div className="login-shell">
+      <div className="login-logo">
         {rejected ? (
           '🚫'
         ) : (

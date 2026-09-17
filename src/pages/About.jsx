@@ -47,7 +47,19 @@ export default function About() {
       </div>
 
       <div className="card" style={{ textAlign: 'center', padding: '32px 18px' }}>
-        <div style={{ fontSize: 40, marginBottom: 8 }}>🏛️</div>
+        <div style={{ marginBottom: 12 }}>
+          < img 
+            src={logoImg} 
+            alt="Logo Si Maqom" 
+            style={{ 
+              width: '80px', 
+              height: '80px', 
+              borderRadius: '50%', 
+              objectFit: 'cover',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 
+            }} 
+          />
+        </div>
         <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.02em' }}>SIMAQOM</div>
         <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>Versi {appVersion}</div>
       </div>

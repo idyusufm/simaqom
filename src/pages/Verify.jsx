@@ -3,7 +3,7 @@ import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/fires
 import { db } from '../firebase'
 import { useAuth } from '../AuthContext'
 import { notifyTelegram } from '../telegram'
-import logoImg from '../component/simaqom_logo.png'
+import logoImg from '../components/simaqom_logo.png'
 
 function randomCode() {
   return String(Math.floor(100000 + Math.random() * 900000))

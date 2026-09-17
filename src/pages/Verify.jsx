@@ -3,6 +3,7 @@ import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/fires
 import { db } from '../firebase'
 import { useAuth } from '../AuthContext'
 import { notifyTelegram } from '../telegram'
+import logoImg from '../component/simaqom_logo.png'
 
 function randomCode() {
   return String(Math.floor(100000 + Math.random() * 900000))
@@ -116,8 +117,17 @@ export default function Verify() {
   }
 
   return (
-    <div className="login-shell">
-      <div className="login-logo">{rejected ? '🚘' : '9'}</div>
+    <div className="login-logo">
+        {rejected ? (
+          '🚫'
+        ) : (
+          <img 
+            src={logoImg} 
+            alt="Logo Si Maqom" 
+            style={{ width: '64px', height: '64px', objectFit: 'contain' }} 
+          />
+        )}
+      </div>
       <div className="login-title">Si Maqom</div>
 
       <div className="login-card">

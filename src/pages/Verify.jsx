@@ -22,31 +22,34 @@ export default function Verify() {
 
   useEffect(() => {
     const ensurePending = async () => {
+      // Gembok fungsi agar tidak jalan berkali-kali
       if (!email || checkedEmail.current === email) return
       checkedEmail.current = email
 
       try {
-        // 1. Sudah pernah disetujui (admin atau bukan)
+        // 1. CEK ALLOWED DULU
         const allowedSnap = await getDoc(doc(db, 'allowedEmails', email))
         if (allowedSnap.exists()) {
           await recheckApproval()
-          return
+          return // 🛑 Berhenti total di sini! Jangan lanjut ke bawah.
         }
 
-        // 2. Sudah pernah ditolak sebelumnya
+        // 2. JIKA TIDAK ADA DI ALLOWED, CEK REJECTED
         const rejectedSnap = await getDoc(doc(db, 'rejectedEmails', email))
         if (rejectedSnap.exists()) {
           setRejected(true)
-          return
+          setCheckingPending(false)
+          return // 🛑 Berhenti total di sini!
         }
 
-        // 3. SEDANG DALAM PROSES (mencegah spam telegram)
+        // 3. JIKA BELUM KEDUANYA, CEK APAKAH SEDANG ANTRI (PENDING)
         const pendingSnap = await getDoc(doc(db, 'pendingApprovals', email))
         if (pendingSnap.exists()) {
-          return
+          setCheckingPending(false)
+          return // 🛑 Berhenti total di sini!
         }
 
-        // 4. Belum pernah diproses sama sekali
+        // 4. JIKA KETIGANYA KOSONG, BARU GENERATE DAN KIRIM TELEGRAM
         const newCode = randomCode()
         const userName = firebaseUser?.displayName || '-'
 
@@ -60,12 +63,11 @@ export default function Verify() {
           'Permintaan akses baru Si Maqom\n' +
             'Nama: ' + userName + '\n' +
             'Email: ' + email + '\n' +
-            'Kode: ' + newCode,
-          email
+            'Kode: ' + newCode
         )
       } catch (e) {
-        console.error('Failed to setup pending approval or send telegram notif:', e)
-        checkedEmail.current = ''
+        console.error('Gagal mengecek status Firebase atau mengirim Telegram:', e)
+        checkedEmail.current = '' // Buka gembok agar bisa dicoba ulang saat refresh
       } finally {
         setCheckingPending(false)
       }

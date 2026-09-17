@@ -21,7 +21,7 @@ export default function Verify() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    const ensurePending = async () -> {
+    const ensurePending = async () => {
       if (!email || checkedEmail.current === email) return
       checkedEmail.current = email
 

@@ -156,7 +156,7 @@ export default function Verify() {
               </form>
             )}
 
-            <p style=0{{ marginTop: 18, fontSize: 15 }}>
+            <p style={{ marginTop: 18, fontSize: 15 }}>
               Salah akun?{' '}
               <button type="button" className="login-toggle-link" onClick={logout}>
                 Keluar

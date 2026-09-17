@@ -152,7 +152,7 @@ export default function Verify() {
                 <button className="btn" type="submit" disabled={busy}>
                   {busy ? 'Memeriksa…' : 'Masuk'}
                 </button>
-                {error && <p className="error-text">{error}</p>
+                {error && <p className="error-text">{error}</p>}
               </form>
             )}
 

@@ -11,6 +11,9 @@ function randomCode() {
 export default function Verify() {
   const { firebaseUser, logout, recheckApproval } = useAuth()
   const email = (firebaseUser?.email || '').toLowerCase()
+  
+  const checkedEmail = React.useRef('')
+
   const [checkingPending, setCheckingPending] = useState(true)
   const [rejected, setRejected] = useState(false)
   const [code, setCode] = useState('')
@@ -18,25 +21,32 @@ export default function Verify() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    const ensurePending = async () => {
-      if (!email) return
+    const ensurePending = async () -> {
+      if (!email || checkedEmail.current === email) return
+      checkedEmail.current = email
 
       try {
-        // 1. Sudah pernah disetujui (admin atau bukan) → langsung lanjut, tanpa notif.
+        // 1. Sudah pernah disetujui (admin atau bukan)
         const allowedSnap = await getDoc(doc(db, 'allowedEmails', email))
         if (allowedSnap.exists()) {
           await recheckApproval()
           return
         }
 
-        // 2. Sudah pernah ditolak sebelumnya → tampilkan status ditolak, tanpa notif baru.
+        // 2. Sudah pernah ditolak sebelumnya
         const rejectedSnap = await getDoc(doc(db, 'rejectedEmails', email))
         if (rejectedSnap.exists()) {
           setRejected(true)
           return
         }
 
-        // 3. Belum pernah diproses sama sekali → buat permintaan baru + kirim notif.
+        // 3. SEDANG DALAM PROSES (mencegah spam telegram)
+        const pendingSnap = await getDoc(doc(db, 'pendingApprovals', email))
+        if (pendingSnap.exists()) {
+          return
+        }
+
+        // 4. Belum pernah diproses sama sekali
         const newCode = randomCode()
         const userName = firebaseUser?.displayName || '-'
 
@@ -55,16 +65,15 @@ export default function Verify() {
         )
       } catch (e) {
         console.error('Failed to setup pending approval or send telegram notif:', e)
+        checkedEmail.current = ''
       } finally {
         setCheckingPending(false)
       }
     }
 
     ensurePending()
-  }, [email, firebaseUser, recheckApproval])
+  }, [email, firebaseUser])
 
-  // Dengarkan secara real-time: begitu admin tekan Terima di Telegram,
-  // dokumen ini otomatis muncul dan user langsung lanjut masuk tanpa refresh.
   useEffect(() => {
     if (!email) return
     const unsub = onSnapshot(doc(db, 'allowedEmails', email), (snap) => {
@@ -75,10 +84,9 @@ export default function Verify() {
     return unsub
   }, [email, recheckApproval])
 
-  // Dengarkan juga status ditolak.
   useEffect(() => {
     if (!email) return
-    const unsub = onSnapshot(doc(db, 'rejectedEmails', email), (snap) => {
+    const unsub = onSnapshot(doc(db, 'rejectedEmails', email), (snap) -> {
       setRejected(snap.exists())
     })
     return unsub
@@ -105,7 +113,7 @@ export default function Verify() {
 
   return (
     <div className="login-shell">
-      <div className="login-logo">{rejected ? '🚫' : '🔑'}</div>
+      <div className="login-logo">{rejected ? '🚘' : '9'}</div>
       <div className="login-title">Si Maqom</div>
 
       <div className="login-card">
@@ -144,11 +152,11 @@ export default function Verify() {
                 <button className="btn" type="submit" disabled={busy}>
                   {busy ? 'Memeriksa…' : 'Masuk'}
                 </button>
-                {error && <p className="error-text">{error}</p>}
+                {error && <p className="error-text">{error}</p>
               </form>
             )}
 
-            <p style={{ marginTop: 18, fontSize: 15 }}>
+            <p style=0{{ marginTop: 18, fontSize: 15 }}>
               Salah akun?{' '}
               <button type="button" className="login-toggle-link" onClick={logout}>
                 Keluar

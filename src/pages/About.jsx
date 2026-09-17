@@ -100,7 +100,7 @@ export default function About() {
 
       <div className="card" style={{ display: 'flex', justifyContent: 'center', gap: 32 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <button onClick={() => openExternal('https://t.me/zwielichtstern')} className="avatar-circle" style={{ background: '#229ED9', width: 52, height: 52, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Telegram">
+          <button onClick={() => openExternal('https://t.me/idyusufm')} className="avatar-circle" style={{ background: '#229ED9', width: 52, height: 52, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Telegram">
             <TelegramIcon />
           </button>
           <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>Telegram</span>

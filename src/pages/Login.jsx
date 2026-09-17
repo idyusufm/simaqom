@@ -6,6 +6,7 @@ import {
 } from 'firebase/auth'
 import { auth, googleProvider } from '../firebase'
 import { useAuth } from '../AuthContext'
+import logoImg from '../components/logo.png'
 
 export default function Login() {
   const { checkError } = useAuth()
@@ -51,7 +52,13 @@ export default function Login() {
 
   return (
     <div className="login-shell">
-      <div className="login-logo">🏛️</div>
+    <div className="login-logo">
+      <img
+        src={logoImg} 
+        alt="Logo Si Maqom" 
+        style={{ width: '64px', height: '64px', objectFit: 'contain' }} 
+      />
+      </div>
       <div className="login-title">Si Maqom</div>
 
       <div className="login-card">

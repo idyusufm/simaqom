@@ -6,7 +6,7 @@ import {
 } from 'firebase/auth'
 import { auth, googleProvider } from '../firebase'
 import { useAuth } from '../AuthContext'
-import logoImg from '../components/logo.png'
+import logoImg from '../components/simaqom_logo.png'
 
 export default function Login() {
   const { checkError } = useAuth()

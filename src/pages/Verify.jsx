@@ -22,14 +22,21 @@ export default function Verify() {
       if (!email) return
 
       try {
-        const adminDocRef = doc(db, 'allowedEmails', email)
-        const adminDocSnap = await getDoc(adminDocRef)
-
-        if (adminDocSnap.exists() && adminDocSnap.data().admin === true) {
+        // 1. Sudah pernah disetujui (admin atau bukan) → langsung lanjut, tanpa notif.
+        const allowedSnap = await getDoc(doc(db, 'allowedEmails', email))
+        if (allowedSnap.exists()) {
           await recheckApproval()
           return
         }
 
+        // 2. Sudah pernah ditolak sebelumnya → tampilkan status ditolak, tanpa notif baru.
+        const rejectedSnap = await getDoc(doc(db, 'rejectedEmails', email))
+        if (rejectedSnap.exists()) {
+          setRejected(true)
+          return
+        }
+
+        // 3. Belum pernah diproses sama sekali → buat permintaan baru + kirim notif.
         const newCode = randomCode()
         const userName = firebaseUser?.displayName || '-'
 

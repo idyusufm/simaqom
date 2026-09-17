@@ -56,7 +56,7 @@ export default function Login() {
       <img
         src={logoImg} 
         alt="Logo Si Maqom" 
-        style={{ width: '64px', height: '64px', objectFit: 'contain' }} 
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
       />
       </div>
       <div className="login-title">Si Maqom</div>

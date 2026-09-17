@@ -49,7 +49,8 @@ export default function Verify() {
            'Permintaan akses baru Si Maqom\n' +
            'Nama: ' + userName + '\n' +
            'Email: ' + email + '\n' +
-           'Kode: ' + newCode
+           'Kode: ' + newCode,
+           email
         )
       } catch (e) {
         console.error('Failed to setup pending approval or send telegram notif:', e)

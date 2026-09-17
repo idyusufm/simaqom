@@ -86,7 +86,7 @@ export default function Verify() {
 
   useEffect(() => {
     if (!email) return
-    const unsub = onSnapshot(doc(db, 'rejectedEmails', email), (snap) -> {
+    const unsub = onSnapshot(doc(db, 'rejectedEmails', email), (snap) => {
       setRejected(snap.exists())
     })
     return unsub

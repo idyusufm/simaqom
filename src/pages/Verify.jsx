@@ -63,8 +63,10 @@ export default function Verify() {
           'Permintaan akses baru Si Maqom\n' +
             'Nama: ' + userName + '\n' +
             'Email: ' + email + '\n' +
-            'Kode: ' + newCode
+            'Kode: ' + newCode,
+          email
         )
+        
       } catch (e) {
         console.error('Gagal mengecek status Firebase atau mengirim Telegram:', e)
         checkedEmail.current = '' // Buka gembok agar bisa dicoba ulang saat refresh

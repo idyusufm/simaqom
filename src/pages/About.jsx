@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import logoImg from '../components/simaqom_logo.png'
 
 const FALLBACK_VERSION = '1.1.2'
 
